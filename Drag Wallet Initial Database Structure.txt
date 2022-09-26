@@ -1,0 +1,16 @@
+Drag Wallet Initial Database Structure:
+
+	Models:
+		1. User
+			UserId, (PK, system auto generated)
+			Email
+			Password
+			ProfileId (FK)
+			...(any other fields for authentication)
+			
+		2. Profile
+			First name
+			Last name
+			Profile picture
+			
+			
