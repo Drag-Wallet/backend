@@ -1,8 +1,8 @@
 from django.http import JsonResponse
 
 
-def internal_server_error():
-    return JsonResponse({"message": "Internal server error"}, status=500)
+def internal_server_error(message="Internal server error"):
+    return JsonResponse({"message": message}, status=500)
 
 
 def required_fields_message(name):
