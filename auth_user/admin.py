@@ -6,4 +6,4 @@ from .models import *
 
 @admin.register(DragUser)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ['id']
+    list_display = ['id', 'user']

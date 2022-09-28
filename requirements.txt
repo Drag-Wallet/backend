@@ -1,11 +1,17 @@
 asgiref==3.5.2
+cffi==1.15.1
+cryptography==38.0.1
 Django==4.1.1
+django-rest-knox==4.2.0
 django-simpleui==2022.7.29
 djangorestframework==3.14.0
+future==0.18.2
 Pillow==9.2.0
 psycopg2-binary==2.9.3
+pycparser==2.21
 PyJWT==2.5.0
 python-decouple==3.6
 pytz==2022.2.1
+serializers==0.2.4
 sqlparse==0.4.2
 tzdata==2022.2
