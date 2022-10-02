@@ -8,7 +8,9 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import JsonResponse
 from django.utils import timezone
+from knox.auth import TokenAuthentication
 from knox.models import AuthToken
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
 from auth_user.models import DragUser
@@ -200,9 +202,11 @@ class ResetPassword(APIView):
 
 
 class ChangePassword(APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
     def post(self, request):
         try:
-            pass
+            return JsonResponse({"message": "hi"})
         except:
             return internal_server_error()
 

@@ -139,6 +139,12 @@ SIMPLEUI_LOADING = True
 SIMPLEUI_CONFIG = {
     'system_keep': True,
 }
+# reset framework
+
+REST_FRAMEWORK = {
+    'PAGE_SIZE': 10,
+
+}
 
 # knox settings
 
@@ -149,5 +155,4 @@ REST_KNOX = {
     'USER_SERIALIZER': 'knox.serializers.UserSerializer',
     'TOKEN_LIMIT_PER_USER': None,
     'AUTO_REFRESH': False,
-    'EXPIRY_DATETIME_FORMAT': api_settings.DATETME_FORMAT,
 }
