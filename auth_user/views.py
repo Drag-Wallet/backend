@@ -14,7 +14,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
 from auth_user.models import DragUser
-from helper import required_fields_message, return_message, internal_server_error
+from helper import required_fields_message, return_message, internal_server_error, check_auth_token
 
 
 class RegisterUserView(APIView):
@@ -45,11 +45,11 @@ class RegisterUserView(APIView):
             new_user = User.objects.create(first_name=first_name, last_name=last_name, email=email, username=email)
             new_user.set_password(password)
             new_user.save()
-            verify_otp = str(''.join([str(random.randint(0, 999)).zfill(3) for _ in range(2)]))
-            verify_otp = jwt.encode(
+            email_verify_otp_token = str(''.join([str(random.randint(0, 999)).zfill(3) for _ in range(2)]))
+            email_verify_otp_token = jwt.encode(
                 {"exp": datetime.datetime.now(tz=timezone.utc) + datetime.timedelta(seconds=30),
-                 "otp": verify_otp}, config('JWT_SECRET'))
-            drag_user = DragUser.objects.create(user=new_user, verify_otp=verify_otp)
+                 "otp": email_verify_otp_token}, config('JWT_SECRET'))
+            drag_user = DragUser.objects.create(user=new_user, email_verify_otp_token=email_verify_otp_token)
             return return_message("User added successfully", 200)
         except Exception as e:
             print(e)
@@ -68,33 +68,39 @@ class LoginUserView(APIView):
                 return required_fields_message('password')
 
             user_exist = User.objects.get(email=email)
-            if user_exist:
-                drag_user = DragUser.objects.get(user=user_exist)
-                valid_credentials = authenticate(username=user_exist, password=password)
-                if valid_credentials:
-                    if drag_user.user.is_active:
-                        if not drag_user.verify_otp:
-                            data = {"id": drag_user.id, "first_name": user_exist.first_name,
-                                    "last_name": user_exist.last_name,
-                                    "email": email, "is_active": user_exist.is_active,
-                                    "token": AuthToken.objects.create(user_exist)[1]}
-                            return JsonResponse({"message": data})
-                        else:
-                            try:
-                                jwt.decode(drag_user.verify_otp, config("JWT_SECRET"), algorithms=["HS256"])
-                            except:
-                                drag_user.verify_otp = jwt.encode(
-                                    {"exp": datetime.datetime.now(tz=timezone.utc) + datetime.timedelta(seconds=600),
-                                     "otp": str(''.join([str(random.randint(0, 999)).zfill(3) for _ in range(2)]))},
-                                    config('JWT_SECRET'))
-                                drag_user.save()
-                            return return_message("Your account is not activated", 400)
-                    else:
-                        return return_message("Your account is disabled, please contact", 400)
-                else:
-                    return return_message("Invalid email and password", 400)
-            else:
+            if not user_exist:
                 return return_message("Invalid email", 400)
+
+            drag_user = DragUser.objects.get(user=user_exist)
+
+            if not drag_user:
+                return return_message("User doesn't exist", 404)
+
+            valid_credentials = authenticate(username=user_exist, password=password)
+
+            if valid_credentials is None:
+                return return_message("Invalid email and password", 400)
+
+            if not drag_user.user.is_active:
+                return return_message("Your account is disabled, please contact", 400)
+
+            if not drag_user.email_verify_otp_token:
+                data = {"id": drag_user.id, "first_name": user_exist.first_name,
+                        "last_name": user_exist.last_name,
+                        "email": email, "is_active": user_exist.is_active,
+                        "token": AuthToken.objects.create(user_exist)[1]}
+                return JsonResponse({"message": data})
+            else:
+                try:
+                    jwt.decode(drag_user.verify_otp, config("JWT_SECRET"), algorithms=["HS256"])
+                except:
+                    drag_user.verify_otp = jwt.encode(
+                        {"exp": datetime.datetime.now(tz=timezone.utc) + datetime.timedelta(seconds=600),
+                         "otp": str(''.join([str(random.randint(0, 999)).zfill(3) for _ in range(2)]))},
+                        config('JWT_SECRET'))
+                    drag_user.save()
+                return return_message("Your account is not activated", 400)
+
         except Exception as e:
             print(e)
             return internal_server_error(e)
@@ -112,24 +118,25 @@ class VerifyAccount(APIView):
                 return required_fields_message('otp')
 
             user_exist = User.objects.get(email=email)
-            if user_exist:
-                drag_user = DragUser.objects.get(user=user_exist)
-                if drag_user:
-                    try:
-                        decode_data = jwt.decode(drag_user.verify_otp, config("JWT_SECRET"), algorithms=["HS256"])
-                        if decode_data['otp'] == otp:
-                            drag_user.verify_otp = None
-                            drag_user.save()
-                            return return_message("account activated", 200)
-                        else:
-                            return return_message("Invalid otp", 400)
-                    except Exception as e:
-                        print(e)
-                        return return_message("otp expired", 400)
-                else:
-                    return return_message("User doesn't exist", 404)
-            else:
+            if not user_exist:
                 return return_message("Invalid email", 404)
+
+            drag_user = DragUser.objects.get(user=user_exist)
+
+            if not drag_user:
+                return return_message("User doesn't exist", 404)
+
+            try:
+                decode_data = jwt.decode(drag_user.verify_otp, config("JWT_SECRET"), algorithms=["HS256"])
+                if decode_data['otp'] == otp:
+                    return return_message("Invalid otp", 400)
+                drag_user.verify_otp = None
+                drag_user.save()
+                return return_message("account activated", 200)
+
+            except Exception as e:
+                print(e)
+                return return_message("otp expired", 400)
         except Exception as e:
             return internal_server_error(e)
 
@@ -140,25 +147,25 @@ class ResendOtp(APIView):
             email = self.request.POST.get('email')
             if not email:
                 return required_fields_message('email')
+
             user_exist = User.objects.get(email=email)
 
-            if user_exist:
-                drag_user = DragUser.objects.get(user=user_exist)
-                if drag_user:
-                    try:
-                        jwt.decode(user_exist.verify_otp, config("JWT_SECRET"), algorithms=["HS256"])
-                        return return_message("otp sent successfully", 200)
-                    except:
-                        drag_user.verify_otp = jwt.encode(
-                            {"exp": datetime.datetime.now(tz=timezone.utc) + datetime.timedelta(seconds=600),
-                             "otp": str(''.join([str(random.randint(0, 999)).zfill(3) for _ in range(2)]))},
-                            config('JWT_SECRET'))
-                        drag_user.save()
-                        return return_message("otp sent", 200)
-                else:
-                    return return_message("User doesn't exist", 404)
-            else:
+            if not user_exist:
                 return return_message("Invalid email", 404)
+
+            drag_user = DragUser.objects.get(user=user_exist)
+            if not drag_user:
+                return return_message("User doesn't exist", 404)
+            try:
+                jwt.decode(user_exist.verify_otp, config("JWT_SECRET"), algorithms=["HS256"])
+                return return_message("otp sent successfully", 200)
+            except:
+                drag_user.verify_otp = jwt.encode(
+                    {"exp": datetime.datetime.now(tz=timezone.utc) + datetime.timedelta(seconds=600),
+                     "otp": str(''.join([str(random.randint(0, 999)).zfill(3) for _ in range(2)]))},
+                    config('JWT_SECRET'))
+                drag_user.save()
+                return return_message("otp sent", 200)
 
         except Exception as e:
             print(e)
@@ -173,22 +180,23 @@ class ForgetPasswordView(APIView):
                 return return_message("email", 404)
             user_exist = User.objects.get(email=email)
 
-            if user_exist:
-                drag_user = DragUser.objects.get(user=user_exist)
-                if drag_user:
-                    try:
-                        drag_user.forget_email = jwt.encode(
-                            {"exp": datetime.datetime.now(tz=timezone.utc) + datetime.timedelta(seconds=600),
-                             "otp": str(''.join([str(random.randint(0, 999)).zfill(3) for _ in range(2)]))},
-                            config('FORGET_JWT_SECRET'))
-                        drag_user.save()
-                        return return_message("otp sent", 200)
-                    except Exception as e:
-                        return return_message(e, 400)
-                else:
-                    return return_message("User doesn't exist", 404)
-            else:
+            if not user_exist:
                 return return_message("Invalid email", 404)
+
+            drag_user = DragUser.objects.get(user=user_exist)
+            if not drag_user:
+                return return_message("User doesn't exist", 404)
+
+            try:
+                drag_user.forget_password_otp_token = jwt.encode(
+                    {"exp": datetime.datetime.now(tz=timezone.utc) + datetime.timedelta(seconds=600),
+                     "otp": str(''.join([str(random.randint(0, 999)).zfill(3) for _ in range(2)]))},
+                    config('FORGET_JWT_SECRET'))
+                drag_user.save()
+                return return_message("otp sent", 200)
+            except Exception as e:
+                return return_message(e, 400)
+
         except Exception as e:
             return internal_server_error(e)
 
@@ -204,16 +212,44 @@ class ResetPassword(APIView):
 class ChangePassword(APIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
+
     def post(self, request):
         try:
-            return JsonResponse({"message": "hi"})
+            user = check_auth_token(request)
+            print(user)
+            return return_message("hi", 200)
         except:
             return internal_server_error()
 
 
 class ChangeEmail(APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
     def post(self, request):
         try:
-            token = 1
-        except:
+            user = check_auth_token(request)
+            new_email = self.request.POST.get('email')
+            if not new_email:
+                return required_fields_message("email")
+
+            user_exist = DragUser.objects.get(user__email=new_email)
+            if user_exist:
+                return return_message("email is already in user", 400)
+
+
+        except Exception as e:
+            print(e)
+            return internal_server_error()
+
+
+class VerifyNewEmail(APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        try:
+            user = check_auth_token(request)
+        except Exception as e:
+            print(e)
             return internal_server_error()

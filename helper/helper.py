@@ -11,3 +11,12 @@ def required_fields_message(name):
 
 def return_message(message, status):
     return JsonResponse({"message": message}, status=status)
+
+
+def check_auth_token(request):
+    try:
+        token = request.auth.user
+        return token
+    except Exception as e:
+        print(e)
+        return None
