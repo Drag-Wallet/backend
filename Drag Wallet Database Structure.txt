@@ -1,0 +1,35 @@
+Drag Wallet Initial Database Structure:
+
+	Models:
+		1. Drag User
+			user (FK Django User model)
+			email_verify_otp_token (OTP token)
+			forget_passord_otp_token (OTP token)
+			avatar
+			
+		2. KYC
+			type (Types: personal, address and bank account)
+			document (File)
+			status (Verifed/Not verified)
+			bank account (FK, conditional, if type=bank account)
+		
+		3. Bank Account
+			account holder name
+			account number
+			routing number
+			account type (Types: checking and savings)
+			bank name (optional)
+		
+		4. Address
+			first_name
+			last_name
+			street
+			street2
+			city
+			state
+			zip
+			country
+			phone
+			email
+			
+			
