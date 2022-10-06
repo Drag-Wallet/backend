@@ -16,3 +16,16 @@ class DragUser(models.Model):
 
     created_at = models.DateTimeField(default=timezone.now, editable=False)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+
+class Address(models.Model):
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    street = models.CharField(max_length=50)
+    street2 = models.CharField(max_length=50, null=True, blank=True)
+    city = models.CharField(max_length=50)
+    state = models.CharField(max_length=50)
+    zip = models.CharField(max_length=6)
+    country = models.CharField(max_length=50)
+    phone = models.CharField(max_length=10)
+    email = models.CharField(max_length=50)
+    
