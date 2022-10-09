@@ -271,4 +271,4 @@ GitHub.sublime-settings
 !**/migrations/__init__.py
 
 # static files
-static
+staticfiles

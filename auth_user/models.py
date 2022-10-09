@@ -17,6 +17,7 @@ class DragUser(models.Model):
     created_at = models.DateTimeField(default=timezone.now, editable=False)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
+
 class Address(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
@@ -28,4 +29,3 @@ class Address(models.Model):
     country = models.CharField(max_length=50)
     phone = models.CharField(max_length=10)
     email = models.CharField(max_length=50)
-    
