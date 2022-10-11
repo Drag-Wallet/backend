@@ -18,6 +18,9 @@ from decouple import config
 from rest_framework.settings import api_settings
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+ASSETS_ROOT = os.getenv('ASSETS_ROOT', '/static/assets')
+CORE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TEMPLATE_DIR = os.path.join(CORE_DIR, "admin_dashboard/templates")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -44,7 +47,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'auth_user'
+    'admin_dashboard.home',
+    'auth_user',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.github',
+    'allauth.socialaccount.providers.twitter'
 ]
 
 MIDDLEWARE = [
@@ -59,11 +68,13 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'drag.urls'
 
+LOGIN_REDIRECT_URL = "home"  # Route defined in home/urls.py
+LOGOUT_REDIRECT_URL = "home"  # Route defined in home/urls.py
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [TEMPLATE_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -71,6 +82,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'admin_dashboard.context_processors.cfg_assets_root'
             ],
         },
     },
@@ -125,8 +137,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_ROOT = os.path.join(CORE_DIR, 'staticfiles')
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = (
+    os.path.join(CORE_DIR, 'admin_dashboard/static'),
+)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -156,3 +172,12 @@ REST_KNOX = {
     'TOKEN_LIMIT_PER_USER': None,
     'AUTO_REFRESH': False,
 }
+
+GITHUB_ID = os.getenv('GITHUB_ID', None)
+GITHUB_SECRET = os.getenv('GITHUB_SECRET', None)
+GITHUB_AUTH = GITHUB_SECRET is not None and GITHUB_ID is not None
+
+AUTHENTICATION_BACKENDS = (
+    "drag.custom-auth-backend.CustomBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
