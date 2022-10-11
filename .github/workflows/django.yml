@@ -32,6 +32,7 @@ jobs:
         DATABASE_USER: userdb
         DATABASE_PASSWORD: password
         DATABASE_PORT: 5432
+        DATABASE_HOST: localhost
         DJANGO_ALLOWED_HOSTS: localhost 127.0.0.1 [::1]
         JWT_SECRET: djangodjango
         FORGET_JWT_SECRET: djangodjango
