@@ -28,10 +28,13 @@ jobs:
     - name: Run Tests
       env:
         SECRET_KEY: 69tgugtg%^fgJO&*&
-        DB_NAME: mydb
-        DB_USER: userdb
-        DB_PASSWORD: password
+        DATABASE_NAME: mydb
+        DATABASE_USER: userdb
+        DATABASE_PASSWORD: password
+        DATABASE_PORT: 5432
         DJANGO_ALLOWED_HOSTS: localhost 127.0.0.1 [::1]
+        JWT_SECRET: djangodjango
+        FORGET_JWT_SECRET: djangodjango
         DEBUG_MODE: False
         TIME_ZONE: Asia/Kolkata
         CACHE_KEY_PREFIX: Halo
