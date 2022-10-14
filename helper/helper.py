@@ -1,3 +1,5 @@
+import random
+
 from django.http import JsonResponse
 
 
@@ -9,7 +11,7 @@ def required_fields_message(name):
     return JsonResponse({"message": f"{name} is required"}, status=400)
 
 
-def return_message(message, status):
+def return_message(message, status=200):
     return JsonResponse({"message": message}, status=status)
 
 
@@ -20,3 +22,9 @@ def check_auth_token(request):
     except Exception as e:
         print(e)
         return None
+
+
+def generate_six_digit_otp():
+    otp = str(''.join([str(random.randint(0, 999)).zfill(3) for _ in range(2)]))
+    print(otp)
+    return otp

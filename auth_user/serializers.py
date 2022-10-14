@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
+from helper.serializer_helper import required
+
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(validators=[UniqueValidator(queryset=User.objects.all())])
@@ -26,21 +28,53 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
 
 class LoginSerializer(serializers.Serializer):
-    email = serializers.CharField(required=True)
+    email = serializers.EmailField(validators=[required])
     password = serializers.CharField(
         label='password',
         write_only=True,
         trim_whitespace=False
     )
 
-    def validators(self, data):
+    def validate(self, data):
         email = data.get('email')
         password = data.get('password')
-        user = authenticate(requests=self.context.get('request'), email=email, password=password)
-        print(user)
+        user = authenticate(requests=self.context.get('request'), username=email, password=password)
         if user is None:
             raise serializers.ValidationError("email or password is invalid")
-        if user.is_active:
+        if not user.is_active:
             raise serializers.ValidationError("account is disabled please contact admin")
         data['user'] = user
-        return user
+        return data
+
+
+class VerifyAccountSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    otp = serializers.CharField(max_length=6, min_length=6, required=True)
+
+    class Meta:
+        fields = ['email', 'otp']
+
+
+class EmailSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+
+    class Meta:
+        fields = ['email']
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    token = serializers.CharField(max_length=256, required=True)
+
+    class Meta:
+        fields = ['token', ]
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
+    class Meta:
+        fields = ['password', 'new_password']
+
+class OtpFieldSerializer(serializers.Serializer):
+    otp = serializers.CharField(max_length=6, min_length=6)
