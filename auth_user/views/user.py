@@ -1,4 +1,6 @@
 import datetime
+import random
+import string
 
 import jwt
 from decouple import config
@@ -12,22 +14,39 @@ from rest_framework import status, views
 from rest_framework.permissions import IsAuthenticated
 
 from auth_user.models import DragUser
+from auth_user.serializers.user import *
 from helper import required_fields_message, return_message, internal_server_error, check_auth_token, \
     generate_six_digit_otp
-from .serializers import *
+
+
+def generate_user_id(name):
+    id = ''
+    for word in name:
+        id += word[0].upper()
+    id = id + ''.join(random.choices(string.ascii_uppercase +
+                                     string.digits, k=20))
+    user = DragUser.objects.filter(id=id)
+    if not len(user):
+        return id
+    generate_user_id(name)
 
 
 class RegisterUserView(views.APIView):
     @swagger_auto_schema(request_body=UserRegistrationSerializer, tags=['auth'])
     def post(self, request):
         try:
+            first_name = self.request.POST.get('first_name')
+            last_name = self.request.POST.get('last_name')
             serializer = UserRegistrationSerializer(data=request.data, context={'request': request})
             if serializer.is_valid():
+                user_id = generate_user_id(first_name.split(" ") + last_name.split(" "))
                 new_user = serializer.save()
+
                 email_verify_otp_token = jwt.encode(
                     {"exp": datetime.datetime.now(tz=timezone.utc) + datetime.timedelta(minutes=10),
                      "otp": generate_six_digit_otp()}, config('JWT_SECRET'))
-                drag_user = DragUser.objects.create(user=new_user, email_verify_otp_token=email_verify_otp_token)
+                DragUser.objects.create(user=new_user, email_verify_otp_token=email_verify_otp_token,
+                                        id=user_id)
                 return return_message("User added successfully", 200)
             return JsonResponse(serializer.errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
@@ -52,7 +71,8 @@ class LoginUserView(views.APIView):
             else:
                 try:
                     jwt.decode(drag_user.email_verify_otp_token, config("JWT_SECRET"), algorithms=["HS256"])
-                except:
+                except Exception as e:
+                    print(e)
                     drag_user.email_verify_otp_token = jwt.encode(
                         {"exp": datetime.datetime.now(tz=timezone.utc) + datetime.timedelta(minutes=10),
                          "otp": generate_six_digit_otp()},
@@ -288,6 +308,7 @@ class VerifyNewEmail(views.APIView):
                 if decode_data['otp'] != otp:
                     return return_message("invalid otp", 400)
                 drag_user.user.email = decode_data['email']
+                drag_user.user.username = decode_data['email']
                 drag_user.change_user_email_otp_token = None
                 drag_user.save()
                 return return_message("email changed successfully")

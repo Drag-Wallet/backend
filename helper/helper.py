@@ -26,5 +26,5 @@ def check_auth_token(request):
 
 def generate_six_digit_otp():
     otp = str(''.join([str(random.randint(0, 999)).zfill(3) for _ in range(2)]))
-    print(otp)
+    print("Your otp is here " + otp)
     return otp

@@ -12,5 +12,9 @@ urlpatterns = [
     path('verify_new_email/', VerifyNewEmail.as_view(), name="verify_new_email"),
     path('resend_new_email_otp/', ResendNewEmailOtp.as_view(), name="resend_new_email_otp"),
     path('forget_password/', ForgetPasswordView.as_view(), name="forget_password"),
-    path('reset_password/', ResetPassword.as_view(), name="reset_password")
+    path('reset_password/', ResetPassword.as_view(), name="reset_password"),
+
+    #     address
+    path('address/', AddressView.as_view(), name="user_address")
+
 ]
