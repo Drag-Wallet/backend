@@ -3,11 +3,12 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
+from django.contrib.auth import authenticate, login
 # Create your views here.
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-from .forms import LoginForm, SignUpForm
+
 from drag.settings import GITHUB_AUTH
+from .forms import LoginForm, SignUpForm
 
 
 def login_view(request):
@@ -23,7 +24,7 @@ def login_view(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect("/")
+                return redirect("/dashboard")
             else:
                 msg = 'Invalid credentials'
         else:

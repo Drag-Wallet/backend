@@ -36,7 +36,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('auth/', include('auth_user.urls')),
-    # path('', include("admin_dashboard.authentication.urls")),
-    # path('', include('admin_dashboard.home.urls')),
+    path('', include("admin_dashboard.authentication.urls")),
+    path('', include('admin_dashboard.home.urls')),
 
 ]

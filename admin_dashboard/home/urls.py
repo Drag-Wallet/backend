@@ -9,9 +9,8 @@ from admin_dashboard.home import views
 urlpatterns = [
 
     # The home page
-    path('', views.index, name='home'),
+    path('dashboard/', views.index, name='home'),
 
     # Matches any html file
-    re_path(r'^.*\.*', views.pages, name='pages'),
-
+    re_path(r'^dashboard/.*\.*', views.pages, name='pages'),
 ]
