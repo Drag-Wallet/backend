@@ -11,6 +11,10 @@ from drag.settings import GITHUB_AUTH
 from .forms import LoginForm, SignUpForm
 
 
+def home_view(request):
+    return render(request, "home.html")
+
+
 def login_view(request):
     form = LoginForm(request.POST or None)
 

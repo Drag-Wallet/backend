@@ -196,7 +196,6 @@ class ResetPassword(views.APIView):
                 return required_fields_message("token")
             password = self.request.GET.get('password')
             drag_user = DragUser.objects.get(forget_password_otp_token=token)
-            print(drag_user)
             if not drag_user:
                 return return_message("invalid link", 400)
             try:
