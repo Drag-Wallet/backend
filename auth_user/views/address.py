@@ -15,7 +15,7 @@ class AddressView(views.APIView):
     permission_classes = (IsAuthenticated,)
     parser_classes = (MultiPartParser,)
     id = openapi.Parameter(
-        'id', in_=openapi.IN_QUERY, description='id', type=openapi.TYPE_STRING)
+        'id', in_=openapi.IN_QUERY, description='id', type=openapi.TYPE_STRING, required=True)
 
     @swagger_auto_schema(tags=['address'])
     def get(self, request):

@@ -11,6 +11,7 @@ from drf_yasg.utils import swagger_auto_schema
 from knox.auth import TokenAuthentication
 from knox.models import AuthToken
 from rest_framework import status, views
+from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 
 from auth_user.models import DragUser
@@ -32,6 +33,8 @@ def generate_user_id(name):
 
 
 class RegisterUserView(views.APIView):
+    parser_classes = (MultiPartParser,)
+
     @swagger_auto_schema(request_body=UserRegistrationSerializer, tags=['auth'])
     def post(self, request):
         try:
@@ -55,6 +58,8 @@ class RegisterUserView(views.APIView):
 
 
 class LoginUserView(views.APIView):
+    parser_classes = (MultiPartParser,)
+
     @swagger_auto_schema(request_body=LoginSerializer, tags=['auth'])
     def post(self, request):
         try:
@@ -87,6 +92,8 @@ class LoginUserView(views.APIView):
 
 
 class VerifyAccount(views.APIView):
+    parser_classes = (MultiPartParser,)
+
     @swagger_auto_schema(request_body=VerifyAccountSerializer, tags=['auth'])
     def post(self, request):
         try:
@@ -123,6 +130,8 @@ class VerifyAccount(views.APIView):
 
 
 class ResendVerifyOtp(views.APIView):
+    parser_classes = (MultiPartParser,)
+
     @swagger_auto_schema(request_body=EmailSerializer, tags=['auth'])
     def post(self, request):
         try:
@@ -155,6 +164,8 @@ class ResendVerifyOtp(views.APIView):
 
 
 class ForgetPasswordView(views.APIView):
+    parser_classes = (MultiPartParser,)
+
     @swagger_auto_schema(request_body=EmailSerializer, tags=['auth'])
     def post(self, request):
         try:
@@ -185,6 +196,7 @@ class ForgetPasswordView(views.APIView):
 
 
 class ResetPassword(views.APIView):
+    parser_classes = (MultiPartParser,)
     password = openapi.Parameter(
         'password', in_=openapi.IN_QUERY, description='password', type=openapi.TYPE_STRING)
 
@@ -216,6 +228,7 @@ class ResetPassword(views.APIView):
 class ChangePassword(views.APIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
+    parser_classes = (MultiPartParser,)
 
     @swagger_auto_schema(request_body=ChangePasswordSerializer, tags=['auth'])
     def post(self, request):
@@ -241,6 +254,7 @@ class ChangePassword(views.APIView):
 class ChangeEmail(views.APIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
+    parser_classes = (MultiPartParser,)
 
     @swagger_auto_schema(request_body=EmailSerializer, tags=['auth'])
     def post(self, request):
@@ -269,6 +283,7 @@ class ChangeEmail(views.APIView):
 class ResendNewEmailOtp(views.APIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
+    parser_classes = (MultiPartParser,)
 
     @swagger_auto_schema(tags=['auth'])
     def post(self, request):
@@ -285,12 +300,14 @@ class ResendNewEmailOtp(views.APIView):
             print(decode_data.otp)
             return return_message("otp sent", 200)
         except Exception as e:
+            print(e)
             return internal_server_error()
 
 
 class VerifyNewEmail(views.APIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
+    parser_classes = (MultiPartParser,)
 
     @swagger_auto_schema(request_body=OtpFieldSerializer, tags=['auth'])
     def post(self, request):
