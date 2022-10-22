@@ -1,10 +1,11 @@
-Drag Wallet Initial Database Structure:
+Drag Wallet Database Structure Till 17-10-2022:
 
 	Models:
 		1. Drag User
 			user (FK Django User model)
 			email_verify_otp_token (OTP token)
 			forget_passord_otp_token (OTP token)
+			change_user_email_otp_token (Change email OTP token)
 			avatar
 			
 		2. KYC
@@ -21,6 +22,7 @@ Drag Wallet Initial Database Structure:
 			bank name (optional)
 		
 		4. Address
+			user (FK DragUser model)
 			first_name
 			last_name
 			street
