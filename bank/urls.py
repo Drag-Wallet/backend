@@ -1,7 +1,7 @@
 from django.urls import path
 
-from bank.views import BankList
+from .views import *
 
 urlpatterns = [
-    path('add/', BankList.as_view())
+    path('user_bank/', UseBankView.as_view())
 ]
