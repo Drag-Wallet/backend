@@ -24,20 +24,19 @@ Drag Wallet Database Structure Till 17-10-2022:
 			bank name (optional)
 			timestamps
 
-        4. User Card
-            card type
-            card number
-            isVerified
-            timestamp
+        	4. User Card
+		    	card type
+		    	card number
+			expiry date
+		    	is_verified
+		    	timestamp
 
-        5. CardOrBankAccountPin
-            pin_type(bank account or user card)
-            bank_account(FK Bank account)
-            user_card(FK Bank Account)
-            pin(6digit)
-            timestamp
-
-
+		5. Card Or BankAccount Pin
+		    	pin_type (bank account or user card)
+		    	bank_account (FK Bank account model)
+		    	user_card (FK Bank Account model)
+		    	pin (6digit)
+		    	timestamp
 		6. Address
 			user (FK DragUser model)
 			first_name
@@ -53,16 +52,23 @@ Drag Wallet Database Structure Till 17-10-2022:
 			timestamps
 
 		7. Wallet
-		    User (FK DragUser model)
-		    amount
-		    isVerified
-            timestamps
+		    	user (FK DragUser model)
+		    	wallet UID (Unique for each user)
+		    	amount
+		    	is_verified
+		    	timestamps
 
+		8. Wallet Transaction
+		    	payee (FK Wallet model)
+		    	payer (FK Wallet model)
+		    	amount
+		    	note (optional, normal text)
+		    	user_requested (boolean)
+		    	timestamps
 
-		8. WalletTransaction
-		    payee(FK DragUser model)
-		    payer(FK DragUser model)
-		    amount
-		    userRequested(boolean)
-		    timestamps
-
+		9. Wallet Payment Request
+		    	request from (FK Wallet model)
+		    	requesting to (FK Wallet model)
+		    	amount
+		    	note (optional, normal text)
+		    	timestamps
