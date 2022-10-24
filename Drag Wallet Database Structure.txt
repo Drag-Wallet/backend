@@ -7,20 +7,37 @@ Drag Wallet Database Structure Till 17-10-2022:
 			forget_passord_otp_token (OTP token)
 			change_user_email_otp_token (Change email OTP token)
 			avatar
-			
+			timestamps
+
 		2. KYC
 			type (Types: personal, address and bank account)
 			document (File)
 			status (Verifed/Not verified)
 			bank account (FK, conditional, if type=bank account)
-		
+			timestamps
+
 		3. Bank Account
 			account holder name
 			account number
 			routing number
 			account type (Types: checking and savings)
 			bank name (optional)
-		
+			timestamps
+
+        4. User Card
+            card type
+            card number
+            isVerified
+            timestamp
+
+        5. CardOrBankAccountPin
+            pin_type(bank account or user card)
+            bank_account(FK Bank account)
+            user_card(FK Bank Account)
+            pin(6digit)
+            timestamp
+
+
 		4. Address
 			user (FK DragUser model)
 			first_name
@@ -33,5 +50,19 @@ Drag Wallet Database Structure Till 17-10-2022:
 			country
 			phone
 			email
-			
-			
+			timestamps
+
+		5. Wallet
+		    User (FK DragUser model)
+		    amount
+		    isVerified
+            timestamps
+
+
+		6. WalletTransaction
+		    payee(FK DragUser model)
+		    payer(FK DragUser model)
+		    amount
+		    userRequested(boolean)
+		    timestamps
+
