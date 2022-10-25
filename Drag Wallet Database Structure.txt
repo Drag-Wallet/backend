@@ -4,24 +4,40 @@ Drag Wallet Database Structure Till 17-10-2022:
 		1. Drag User
 			user (FK Django User model)
 			email_verify_otp_token (OTP token)
-			forget_passord_otp_token (OTP token)
+			forget_password_otp_token (OTP token)
 			change_user_email_otp_token (Change email OTP token)
 			avatar
-			
+			timestamps
+
 		2. KYC
 			type (Types: personal, address and bank account)
 			document (File)
-			status (Verifed/Not verified)
+			status (Verified/Not verified)
 			bank account (FK, conditional, if type=bank account)
-		
+			timestamps
+
 		3. Bank Account
 			account holder name
 			account number
 			routing number
 			account type (Types: checking and savings)
 			bank name (optional)
-		
-		4. Address
+			timestamps
+
+        	4. User Card
+		    	card type
+		    	card number
+			expiry date
+		    	is_verified
+		    	timestamp
+
+		5. Card Or BankAccount Pin
+		    	pin_type (bank account or user card)
+		    	bank_account (FK Bank account model)
+		    	user_card (FK Bank Account model)
+		    	pin (6digit)
+		    	timestamp
+		6. Address
 			user (FK DragUser model)
 			first_name
 			last_name
@@ -33,5 +49,26 @@ Drag Wallet Database Structure Till 17-10-2022:
 			country
 			phone
 			email
-			
-			
+			timestamps
+
+		7. Wallet
+		    	user (FK DragUser model)
+		    	wallet UID (Unique for each user)
+		    	amount
+		    	is_verified
+		    	timestamps
+
+		8. Wallet Transaction
+		    	payee (FK Wallet model)
+		    	payer (FK Wallet model)
+		    	amount
+		    	note (optional, normal text)
+		    	user_requested (boolean)
+		    	timestamps
+
+		9. Wallet Payment Request
+		    	request from (FK Wallet model)
+		    	requesting to (FK Wallet model)
+		    	amount
+		    	note (optional, normal text)
+		    	timestamps

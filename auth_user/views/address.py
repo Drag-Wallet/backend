@@ -58,7 +58,7 @@ class AddressView(views.APIView):
                 print(request.data['first_name'])
                 print(user_data)
                 address_updated = Address.objects.update(user=drag_user, **user_data, id=id)
-                if address_updated is 1:
+                if address_updated == 1:
                     return return_message("address updated")
                 return return_message("Invalid address", 400)
             return JsonResponse(address.errors, safe=False, status=400)
