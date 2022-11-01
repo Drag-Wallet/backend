@@ -28,3 +28,7 @@ def generate_six_digit_otp():
     otp = str(''.join([str(random.randint(0, 999)).zfill(3) for _ in range(2)]))
     print("Your otp is here " + otp)
     return otp
+
+
+def get_values_from_request(request):
+    return {x: request.data[x] for x in request.data.keys()}
