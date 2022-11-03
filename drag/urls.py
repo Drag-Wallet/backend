@@ -38,6 +38,7 @@ urlpatterns = [
 
     path('auth/', include('auth_user.urls')),
     path('bank/', include('bank.urls')),
+    path('wallet/', include('wallet.urls')),
 
     path('', include("admin_dashboard.authentication.urls")),
     path('', include('admin_dashboard.home.urls')),
