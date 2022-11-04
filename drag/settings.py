@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     'admin_dashboard.home',
     'auth_user',
     'bank',
-
+    'wallet',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',

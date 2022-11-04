@@ -36,9 +36,9 @@ class AddressView(views.APIView):
             address = AddressSerializer(data=request.data, context={'request': request})
             if address.is_valid():
                 drag_user = DragUser.objects.get(user=user)
-                user_data = {x: request.data[x] for x in request.data.keys()}
+                user_data = get_values_from_request(request)
                 Address.objects.create(user=drag_user, **user_data)
-                return return_message("hi")
+                return return_message("address added")
 
             return JsonResponse(address.errors, safe=False, status=400)
 
@@ -51,12 +51,12 @@ class AddressView(views.APIView):
         try:
             user = check_auth_token(request)
             id = self.request.GET.get('id')
+            if not id:
+                return required_fields_message('id')
             address = AddressSerializer(data=request.data, context={'request': request})
             if address.is_valid():
                 drag_user = DragUser.objects.get(user=user)
-                user_data = {x: request.data[x] for x in request.data.keys()}
-                print(request.data['first_name'])
-                print(user_data)
+                user_data = get_values_from_request(request)
                 address_updated = Address.objects.update(user=drag_user, **user_data, id=id)
                 if address_updated == 1:
                     return return_message("address updated")

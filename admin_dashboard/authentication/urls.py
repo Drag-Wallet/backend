@@ -11,7 +11,7 @@ from .views import login_view, register_user, home_view
 urlpatterns = [
     path('', home_view, name="home"),
     path('dashboard/login/', login_view, name="login"),
-    path('register/', register_user, name="register"),
+    # path('register/', register_user, name="register"),
     path("logout/", LogoutView.as_view(), name="logout"),
     path('social_login/', include('allauth.urls')),
 ]
