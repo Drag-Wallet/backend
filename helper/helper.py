@@ -1,5 +1,5 @@
 import random
-
+import string
 from django.http import JsonResponse
 
 
@@ -32,3 +32,7 @@ def generate_six_digit_otp():
 
 def get_values_from_request(request):
     return {x: request.data[x] for x in request.data.keys()}
+
+
+def generate_secret_key():
+    return ''.join(random.choice(string.ascii_letters + string.digits) for i in range(100))

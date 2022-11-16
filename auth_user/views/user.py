@@ -17,7 +17,7 @@ from rest_framework.permissions import IsAuthenticated
 from auth_user.models import DragUser
 from auth_user.serializers.user import *
 from helper import required_fields_message, return_message, internal_server_error, check_auth_token, \
-    generate_six_digit_otp
+    generate_six_digit_otp, generate_secret_key
 
 
 def generate_user_id(name):
@@ -215,6 +215,7 @@ class ResetPassword(views.APIView):
                 if not password:
                     return return_message("valid link")
                 user = User.objects.get(email=drag_user.user.email)
+                user.secret_token = generate_secret_key()
                 user.set_password(password)
                 return return_message("password changed successfully")
             except Exception as e:
