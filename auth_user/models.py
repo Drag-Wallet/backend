@@ -4,10 +4,13 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 
+from helper import generate_secret_key
+
 
 # Create your models here.
 class DragUser(models.Model):
     id = models.CharField(max_length=100, editable=False, primary_key=True)
+    secret_key = models.CharField(max_length=100, default=generate_secret_key)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     email_verify_otp_token = models.CharField(max_length=256, null=True, blank=True)
     forget_password_otp_token = models.CharField(max_length=256, null=True, blank=True)
