@@ -12,8 +12,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 import os
 from datetime import timedelta
 from pathlib import Path
-from decouple import config
 
+from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 from rest_framework.settings import api_settings
 
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'simpleui',
     'rest_framework',
     'knox',
+    'corsheaders',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -68,6 +69,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
 ]
 
 ROOT_URLCONF = 'drag.urls'
