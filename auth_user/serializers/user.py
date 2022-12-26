@@ -40,9 +40,9 @@ class LoginSerializer(serializers.Serializer):
         password = data.get('password')
         user = authenticate(requests=self.context.get('request'), username=email, password=password)
         if user is None:
-            raise serializers.ValidationError("email or password is invalid")
+            raise serializers.ValidationError("email or password is invalid", 401)
         if not user.is_active:
-            raise serializers.ValidationError("account is disabled please contact admin")
+            raise serializers.ValidationError("account is disabled please contact admin", 401)
         data['user'] = user
         return data
 

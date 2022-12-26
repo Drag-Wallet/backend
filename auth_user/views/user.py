@@ -85,7 +85,7 @@ class LoginUserView(views.APIView):
                     drag_user.save()
                 return return_message("Your account is not activated", 400)
         except serializers.ValidationError as ve:
-            return return_message(ve.__dict__['detail']['non_field_errors'][0].title(), 200)
+            return return_message(ve.__dict__['detail']['non_field_errors'][0].title(), 400)
         except Exception as e:
             print(e)
             return internal_server_error()
